@@ -116,4 +116,4 @@ There's only one thing left now and it's not the fun part: extracting the colors
 
 You may notice the same colors are being re-used which may my job slightly easier.
 
-And that's pretty much it! The rest was all about guessing the right size and position of everything. You can check the final version of the code right here on Github, or on [CodePen](http://todo).
+And that's pretty much it! The rest was all about guessing the right size and position of everything. You can check the final version of the code right here on Github, or on [CodePen](https://codepen.io/Co_is_tired_of_his_username_being_taken/pen/PowpmVe).
