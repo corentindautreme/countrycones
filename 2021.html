@@ -1,0 +1,139 @@
+<html>
+	<style type="text/css">
+		html {
+		    height: 100%;
+		    background-size: cover;
+			background: #dadada;
+			background: #030b27;
+			background: linear-gradient(20deg, #392556, #200c53 70%);
+			width: 100%
+			height: 100%;
+		}
+
+		.circle {
+			width: 800px;
+			height: 800px;
+			/*width: 540px;
+			height: 540px;*/
+			margin: 0 auto;
+			margin-left: 0;
+			position: relative;
+			overflow: hidden;
+			border-radius: 100%;
+		}
+
+		.slice {
+			width: 100%;
+			height: 100%;
+			position: absolute;
+			overflow: hidden;
+			transform: translate(0, -50%) rotate(90deg) rotate(calc(var(--offset, 0) * 1deg));
+			transform-origin: 50% 100%;
+		}
+
+		.slice:before {
+			width: 100%;
+			height: 100%;
+			background: radial-gradient(circle at 50% 0%,
+				var(--color1, transparent) 0,
+				var(--color1, transparent) 5.5%,
+				var(--color2, transparent) 5.5%,
+				var(--color2, transparent) 11.5%,
+				var(--color3, transparent) 11.5%,
+				var(--color3, transparent) 18%,
+				var(--color4, transparent) 18%,
+				var(--color4, transparent) 24%,
+				var(--color5, transparent) 24%,
+				var(--color5, transparent) 30.5%,
+				var(--color6, transparent) 30.5%,
+				var(--color6, transparent) 38%,
+				var(--color7, transparent) 38%,
+				var(--color7, transparent) 100%
+			);
+			content: '';
+			position: absolute;
+			transform: translate(0, 100%) rotate(calc(var(--value, 45) * 1deg));
+			transform-origin: 50% 0;
+		}
+	</style>
+
+	 <body>
+	 	<div class="circle">
+	 		<!-- NO -->
+			<div class="slice" style="--color1: #fc0000; --color2: #fc0000; --color3: #fc0000; --color4: #fc0000; --offset:14; --value: 6;"></div>
+			<div class="slice" style="--color1: #0750c6; --color2: #0750c6; --color3: #0750c6; --color4: #0750c6; --offset:19; --value: 6;"></div>
+
+	 		<!-- DK, SE, FI -->
+			<div class="slice" style="--color1: #fc0000; --color2: #fc0000; --color3: #fc0000; --color4: #0750c6; --color5: #0750c6; --color6: #fff; --offset: 46; --value: 6;"></div>
+			<div class="slice" style="--color1: #fff; --color2: #fff; --color3: #fff; --color4: #ffc832; --color5: #ffc832; --color6: #1ac0f8; --offset: 51; --value: 6;"></div>
+
+			<!-- LV, EE -->
+			<div class="slice" style="--color1: #be0000; --color2: #be0000; --color3: #be0000; --color4: #be0000; --color5: #be0000; --color6: #000; --offset: 57; --value: 6;"></div>
+			<div class="slice" style="--color1: #fff; --color2: #fff; --color3: #fff; --color4: #fff; --color5: #fff; --color6: #0850c6; --offset: 63; --value: 6;"></div>
+
+			<!-- LT -->
+			<div class="slice" style="--color1: #ffc732; --color2: #ffc732; --color3: #ffc732; --color4: #ffc732; --color5: #ffc732; --offset: 68; --value: 6;"></div>
+			<div class="slice" style="--color1: #01a95b; --color2: #01a95b; --color3: #01a95b; --color4: #01a95b; --color5: #01a95b; --offset: 73; --value: 6;"></div>
+
+			<!-- DE, BY, RU -->
+			<div class="slice" style="--color1: #000; --color2: #000; --color3: #fc0000; --color4: #fc0000; --color5: #fc0000; --color6: #fc0000; --color7: #fff; --offset: 79; --value: 6;"></div>
+			<div class="slice" style="--color1: #fc0000; --color2: #fc0000; --color3: #01a95b; --color4: #01a95b; --color5: #01a95b; --color6: #01a95b; --color7: #fc0000; --offset: 84; --value: 6;"></div>
+
+			<!-- PL, UA -->
+			<div class="slice" style="--color1: #fff; --color2: #fff; --color3: #fff; --color4: #fff; --color5: #1ac0f8; --color6: #1ac0f8; --offset: 90; --value: 6;"></div>
+			<div class="slice" style="--color1: #fc0000; --color2: #fc0000; --color3: #fc0000; --color4: #fc0000; --color5: #ffc732; --color6: #ffc732; --offset: 95; --value: 6;"></div>
+
+			<!-- CZ, MD, GE, AZ -->
+			<div class="slice" style="--color1: #fff; --color2: #fff; --color3: #fff; --color4: #1ac0f8; --color5: #1ac0f8; --color6: #fff; --color7: #1ac0f8; --offset: 100; --value: 6;"></div>
+			<div class="slice" style="--color1: #fc0000; --color2: #fc0000; --color3: #fc0000; --color4: #fc0000; --color5: #fc0000; --color6: #fc0000; --color7: #01a95b; --offset: 105; --value: 6;"></div>
+
+			<!-- AT, RO, AM -->
+			<div class="slice" style="--color1: #fc0000; --color2: #fc0000; --color3: #fc0000; --color4: #0750c6; --color5: #0750c6; --color6: #fc0000; --offset: 110; --value: 6;"></div>
+			<div class="slice" style="--color1: #fff; --color2: #fff; --color3: #fff; --color4: #ffc732; --color5: #ffc732; --color6: #0750c6; --offset: 116; --value: 6;"></div>
+
+			<!-- RS, BG, IL, AU -->
+			<div class="slice" style="--color1: #fff; --color2: #fff; --color3: #fff; --color4: #fff; --color5: #fff; --color6: #fff; --color7: #0750c6; --offset: 121; --value: 6;"></div>
+			<div class="slice" style="--color1: #0750c6; --color2: #0750c6; --color3: #0750c6; --color4: #0750c6; --color5: #01a95b; --color6: #0750c6; --color7: #0750c6; --offset: 126; --value: 6;"></div>
+
+			<!-- SI, HR, MK, CY -->
+			<div class="slice" style="--color1: #fff; --color2: #fff; --color3: #fff; --color4: #fff; --color5: #fc0000; --color6: #ff8c33; --offset: 132; --value: 6;"></div>
+			<div class="slice" style="--color1: #fc0000; --color2: #fc0000; --color3: #fc0000; --color4: #fc0000; --color5: #ffc832; --color6: #fff; --offset: 138; --value: 6;"></div>
+
+			<!-- IT, AL, GR -->
+			<div class="slice" style="--color1: #fff; --color2: #fff; --color3: #fff; --color4: #fff; --color5: #fc0000; --color6: #fff; --offset: 143; --value: 6;"></div>
+			<div class="slice" style="--color1: #fc0000; --color2: #fc0000; --color3: #fc0000; --color4: #fc0000; --color5: #fc0000; --color6: #0750c6; --offset: 148; --value: 6;"></div>
+
+			<!-- CH, SM, MT -->
+			<div class="slice" style="--color1: #fc0000; --color2: #fc0000; --color3: #fff; --color4: #fff; --color5: #fff; --color6: #fff; --offset: 153; --value: 6;"></div>
+			<div class="slice" style="--color1: #fff; --color2: #fff; --color3: #1ac0f8; --color4: #1ac0f8; --color5: #fc0000; --color6: #fc0000; --offset: 158; --value: 6;"></div>
+
+			<!-- BE -->
+			<div class="slice" style="--color1: #ffc832; --offset: 188; --value: 6;"></div>
+			<div class="slice" style="--color1: #fc0000; --offset: 193; --value: 6;"></div>
+
+	        <!-- ES, FR -->
+			<div class="slice" style="--color1: #fff; --color2: #fff; --color3: #fc0000; --color4: #fc0000; --color5: #fc0000; --offset: 198; --value: 6;"></div>
+			<div class="slice" style="--color1: #fc0000; --color2: #fc0000; --color3: #ffc832; --color4: #ffc832; --color5: #ffc832; --offset: 203; --value: 6;"></div>
+
+	        <!-- PT -->
+			<div class="slice" style="--color1: #01a95b; --color2: #01a95b; --color3: #01a95b; --color4: #01a95b; --color5: #01a95b; --color6: #01a95b; --offset: 208; --value: 6;"></div>
+			<div class="slice" style="--color1: #fc0000; --color2: #fc0000; --color3: #fc0000; --color4: #fc0000; --color5: #fc0000; --color6: #fc0000; --offset: 213; --value: 6;"></div>
+
+	        <!-- GB -->
+			<div class="slice" style="--color1: #0750c6; --color2: #0750c6; --offset: 253; --value: 6;"></div>
+			<div class="slice" style="--color1: #fc0000; --color2: #fc0000; --offset: 258; --value: 6;"></div>
+	        
+	        <!-- IE -->
+			<div class="slice" style="--color1: #01a95b; --color2: #01a95b; --color3: #01a95b; --offset: 275; --value: 6;"></div>
+			<div class="slice" style="--color1: #ff8c33; --color2: #ff8c33; --color3: #ff8c33; --offset: 280; --value: 6;"></div>
+
+	        <!-- IS -->
+			<div class="slice" style="--color1: #0850c6; --color2: #0850c6; --color3: #0850c6; --color4: #0850c6; --color5: #0850c6; --color6: #0850c6; --color7: #0850c6; --offset: 308; --value: 6;"></div>
+			<div class="slice" style="--color1: #fff; --color2: #fff; --color3: #fff; --color4: #fff; --color5: #fff; --color6: #fff; --color7: #fff; --offset: 314; --value: 6;"></div>
+
+			<!-- NL -->
+			<div class="slice" style="--color1: #fff; --offset:354 ; --value: 6;"></div>
+			<div class="slice" style="--color1: #fc0000; --offset:360 ; --value: 6;"></div>
+		</div>
+	</body>
+</html>
