@@ -1,0 +1,564 @@
+<html>
+	<head>
+		<style type="text/css">
+			html {
+				width: 100%;
+				height: 100%;
+			    background-size: cover;
+				background: #dadada;
+				background: #030b27;
+				background: linear-gradient(20deg, #392556, #200c53 70%);
+				background-attachment: fixed;
+				font-family: 'Montserrat', sans-serif;
+			}
+
+			#commands {
+				position: absolute;
+				margin: 1em;
+				color: white;
+                z-index: 10;
+			}
+
+			.circle {
+				position: relative;
+				margin: 0 auto;
+				margin-top: 50px;
+				width: 900px;
+				height: 900px;
+				overflow: hidden;
+				border-radius: 100%;
+			}
+
+			#grid {
+				position: absolute;
+				width: 100%;
+				height: 100%;
+		        display: none;
+				z-index: 5;
+			}
+
+			#grid .separator {
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				transform: translate(-50%, -50%);
+				border: 1px dashed #a0a0a0;
+				border-radius: 100%;
+			}
+
+			.slice {
+				position: absolute;
+				width: 100%;
+				height: 100%;
+				overflow: hidden;
+				transform: translate(0, -50%) rotate(90deg) rotate(calc(var(--offset, 0) * 1deg));
+				transform-origin: 50% 100%;
+			}
+
+			.slice:before {
+				position: absolute;
+				width: 100%;
+				height: 100%;
+				content: '';
+				transform: translate(0, 100%) rotate(calc(var(--value, 45) * 1deg));
+				transform-origin: 50% 0;
+			}
+
+			.slice:after {
+		        position: absolute;
+		        bottom: 0;
+		        width: 50%;
+		        display: none;
+		        content: '';
+		        border-top: 1px dashed #a0a0a0;
+		    }
+
+			.label {
+				position: absolute;
+				bottom: 0;
+				right: 0;
+				width: 50%;
+				display: none;
+				font-size: 14px;
+				text-align: right;
+				transform: translate(0, 50%) rotate(calc(var(--value, 45)/2 * 1deg + 180deg));
+				transform-origin: 0 50%;
+			}
+		</style>
+
+		<script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+
+		<script>
+			var cities = {
+				"Tirana": {"country": "Albania", "lat": 41.31666667, "lon": 19.816667, "code": "AL", "colors": ["#fc0000", "#fc0000"]},
+				"Yerevan": {"country": "Armenia", "lat": 40.16666667, "lon": 44.5, "code": "AM", "colors": ["#fc0000", "#0750c6"]},
+				"Canberra": {"country": "Australia", "lat": -35.26666667, "lon": 149.133333, "code": "AU", "colors": ["#0750c6", "#0750c6"]},
+				"Vienna": {"country": "Austria", "lat": 48.2, "lon": 16.366667, "code": "AT", "colors": ["#fc0000", "#fff"]},
+				"Baku": {"country": "Azerbaijan", "lat": 40.38333333, "lon": 49.866667, "code": "AZ", "colors": ["#1ac0f8", "#01a95b"]},
+				"Minsk": {"country": "Belarus", "lat": 53.9, "lon": 27.566667, "code": "BY", "colors": ["#fc0000", "#01a95b"]},
+				"Brussels": {"country": "Belgium", "lat": 50.83333333, "lon": 4.333333, "code": "BE", "colors": ["#ffc832", "#fc0000"]},
+				"Sofia": {"country": "Bulgaria", "lat": 42.68333333, "lon": 23.316667, "code": "BG", "colors": ["#fff", "#01a95b"]},
+				"Zagreb": {"country": "Croatia", "lat": 45.8, "lon": 16, "code": "HR", "colors": ["#fff", "#fc0000"]},
+				"Nicosia": {"country": "Cyprus", "lat": 35.16666667, "lon": 33.366667, "code": "CY", "colors": ["#ff8c33", "#fff"]},
+				"Prague": {"country": "Czechia", "lat": 50.08333333, "lon": 14.466667, "code": "CZ", "colors": ["#fff", "#fc0000"]},
+				"Copenhagen": {"country": "Denmark", "lat": 55.66666667, "lon": 12.583333, "code": "DK", "colors": ["#fc0000", "#fff"]},
+				"Tallinn": {"country": "Estonia", "lat": 59.43333333, "lon": 24.716667, "code": "EE", "colors": ["#000", "#0850c6"]},
+				"Helsinki": {"country": "Finland", "lat": 60.16666667, "lon": 24.933333, "code": "FI", "colors": ["#fff", "#1ac0f8"]},
+				"Paris": {"country": "France", "lat": 48.86666667, "lon": 2.333333, "code": "FR", "colors": ["#fff", "#fc0000"]},
+				"Tbilisi": {"country": "Georgia", "lat": 41.68333333, "lon": 44.833333, "code": "GE", "colors": ["#fff", "#fc0000"]},
+				"Berlin": {"country": "Germany", "lat": 52.51666667, "lon": 13.4, "code": "DE", "colors": ["#000", "#fc0000"]},
+				"Athens": {"country": "Greece", "lat": 37.98333333, "lon": 23.733333, "code": "GR", "colors": ["#fff", "#0750c6"]},
+				"Reykjavik": {"country": "Iceland", "lat": 64.15, "lon": -21.95, "code": "IS", "colors": ["#0850c6", "#fff"]},
+				"Dublin": {"country": "Ireland", "lat": 53.31666667, "lon": -6.233333, "code": "IE", "colors": ["#01a95b", "#ff8c33"]},
+				"Jerusalem": {"country": "Israel", "lat": 31.76666667, "lon": 35.233333, "code": "IL", "colors": ["#fff", "#0750c6"]},
+				"Rome": {"country": "Italy", "lat": 41.9, "lon": 12.483333, "code": "IT", "colors": ["#fff", "#fc0000"]},
+				"Riga": {"country": "Latvia", "lat": 56.95, "lon": 24.1, "code": "LV", "colors": ["#be0000", "#fff"]},
+				"Vilnius": {"country": "Lithuania", "lat": 54.68333333, "lon": 25.316667, "code": "LT", "colors": ["#ffc732", "#01a95b"]},
+				"Valletta": {"country": "Malta", "lat": 35.88333333, "lon": 14.5, "code": "MT", "colors": ["#fff", "#fc0000"]},
+				"Chisinau": {"country": "Moldova", "lat": 47, "lon": 28.85, "code": "MD", "colors": ["#1ac0f8", "#fc0000"]},
+				"Amsterdam": {"country": "Netherlands", "lat": 52.3676, "lon": 4.9041, "code": "NL", "colors": ["#fff", "#fc0000"]},
+				"Rotterdam": {"country": "Netherlands", "lat": 51.9244, "lon": 4.4777, "code": "NL", "colors": ["#fff", "#fc0000"]},
+				"Skopje": {"country": "North Macedonia", "lat": 42, "lon": 21.433333, "code": "MK", "colors": ["#fc0000", "#ffc832"]},
+				"Oslo": {"country": "Norway", "lat": 59.91666667, "lon": 10.75, "code": "NO", "colors": ["#fc0000", "#0750c6"]},
+				"Warsaw": {"country": "Poland", "lat": 52.25, "lon": 21, "code": "PL", "colors": ["#fff", "#fc0000"]},
+				"Lisbon": {"country": "Portugal", "lat": 38.71666667, "lon": -9.133333, "code": "PT", "colors": ["#01a95b", "#fc0000"]},
+				"Bucharest": {"country": "Romania", "lat": 44.43333333, "lon": 26.1, "code": "RO", "colors": ["#0750c6", "#ffc732"]},
+				"Moscow": {"country": "Russia", "lat": 55.75, "lon": 37.6, "code": "RU", "colors": ["#fff", "#fc0000"]},
+				"San Marino": {"country": "San Marino", "lat": 43.93333333, "lon": 12.416667, "code": "SM", "colors": ["#fff", "#1ac0f8"]},
+				"Belgrade": {"country": "Serbia", "lat": 44.83333333, "lon": 20.5, "code": "RS", "colors": ["#fff", "#0750c6"]},
+				"Ljubljana": {"country": "Slovenia", "lat": 46.05, "lon": 14.516667, "code": "SI", "colors": ["#fff", "#fc0000"]},
+				"Madrid": {"country": "Spain", "lat": 40.4, "lon": -3.683333, "code": "ES", "colors": ["#fc0000", "#ffc832"]},
+				"Stockholm": {"country": "Sweden", "lat": 59.33333333, "lon": 18.05, "code": "SE", "colors": ["#0750c6", "#ffc832"]},
+				"Bern": {"country": "Switzerland", "lat": 46.91666667, "lon": 7.466667, "code": "CH", "colors": ["#fc0000", "#fff"]},
+				"Kyiv": {"country": "Ukraine", "lat": 50.43333333, "lon": 30.516667, "code": "UA", "colors": ["#1ac0f8", "#ffc732"]},
+				"London": {"country": "United Kingdom", "lat": 51.5, "lon": -0.083333, "code": "GB", "colors": ["#0750c6", "#fc0000"]}
+			};
+
+			var SECTIONS_AMOUNT = 7;
+
+			function degreesToRadians(degrees) {
+	  			return degrees * Math.PI / 180;
+			}
+
+			function distanceInKmBetweenEarthCoordinates(lat1, lon1, lat2, lon2) {
+				var earthRadiusKm = 6371;
+
+				var dLat = degreesToRadians(lat2-lat1);
+				var dLon = degreesToRadians(lon2-lon1);
+
+				lat1 = degreesToRadians(lat1);
+				lat2 = degreesToRadians(lat2);
+
+				var a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.sin(dLon/2) * Math.sin(dLon/2) * Math.cos(lat1) * Math.cos(lat2); 
+				var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+				return earthRadiusKm * c;
+			}
+
+			function angleBetweenCoordinates(lat1, lon1, lat2, lon2) {
+				var dy = lat2 - lat1;
+				var dx = Math.cos(Math.PI/180 * lat1) * (lon2 - lon1);
+				var angle = Math.atan2(dy, dx) * 180 / Math.PI;
+				// converting to a "clockwise" 360° referential, plus a 2.60° offset (the first "slice" has a 2.60° angle)
+				return (270 - (180 + angle) + 360 + 2.6) % 360
+			}
+
+			function distanceInKmBetweenTwoCities(city1, city2) {
+				var lat1 = cities[city1].lat;
+				var lon1 = cities[city1].lon;
+				var lat2 = cities[city2].lat;
+				var lon2 = cities[city2].lon;
+				return distanceInKmBetweenEarthCoordinates(lat1, lon1, lat2, lon2);
+			}
+
+			function angleBetween2Cities(city1, city2) {
+				var lat1 = cities[city1].lat;
+				var lon1 = cities[city1].lon;
+				var lat2 = cities[city2].lat;
+				var lon2 = cities[city2].lon;
+				return angleBetweenCoordinates(lat1, lon1, lat2, lon2);
+			}
+
+			function distanceToSliceSections(distance, slice_size, first_section) {
+				if (first_section) {
+					return Math.ceil(distance / (3200 / slice_size));
+				}
+				return Math.ceil(distance / (3200 / (slice_size / 2) ));
+			}
+
+			function generateSectionSizesForSlice(slice, sliceSize) {
+				if (slice.length >= sliceSize) {
+					for (var i=0; i<slice.length; i++) {
+						slice[i].sections = 1;
+					}
+				}
+				else if (slice.length == 1) {
+					slice[0].sections = distanceToSliceSections(slice[0].distance, sliceSize, true);
+					if (slice[0].sections > sliceSize) {
+						slice[0].sections = sliceSize;
+					}
+				}
+				else {
+					slice[0].sections = distanceToSliceSections(slice[0].distance, sliceSize, true);
+					for (var i=1; i<slice.length; i++) {
+						slice[i].sections = distanceToSliceSections(slice[i].distance - slice[i-1].distance, sliceSize, false);
+					}
+					var totalSections = slice.reduce( (prev, cur) => prev + cur.sections, 0);
+					// if total sections > section limit AND there are sections (except the first one) that have a size of more than 1
+					// (sum(section sizes) of all sections minus size of the first one should be equal to size(slice) - 1)
+					if (totalSections > sliceSize && totalSections - slice[0].sections > slice.length - 1) {
+						do {
+							for (var i=1; i<slice.length; i++) {
+								if (slice[i].sections > 1) slice[i].sections = slice[i].sections - 1;
+							}
+							totalSections = slice.reduce( (prev, cur) => prev + cur.sections, 0);
+						} while (totalSections > sliceSize && totalSections - slice[0].sections > slice.length - 1);
+					}
+
+					// if we still have too many sections, start reducing the size of the first one
+					while (totalSections > sliceSize && slice[0].sections >= 1) {
+						slice[0].sections--;
+						totalSections--;
+					}
+				}
+			}
+
+			function drawSlices(slices, sliceSize) {
+				var globalShift = 0;
+				var i;
+				for (i=1; i<=slices.length; i++) {
+					var countries = [];
+					var slice1 = '<div class="slice" style="';
+					var currentSection = 0;
+					if (slices[i-1].length == 0) {
+						// inserting an empty slice (for the "show grid" mode)
+						for (var j=0; j<sliceSize; j++) {
+							slice1 += '--color' + j + ': transparent; '
+						}
+					} else {
+						for (var j=0; j<slices[i-1].length; j++) {
+							countries.push(slices[i-1][j].country);
+							for (var k=0; k<slices[i-1][j]["sections"]; k++) {
+								currentSection += 1;
+								var color = slices[i-1].length > 0 ? cities[slices[i-1][j].city].colors[0] : "transparent";
+								slice1 += '--color' + currentSection + ': ' + color + '; ';
+							}
+						}
+					}
+					if (i > 1 && slices[i-2].length > 0) {
+						globalShift++;
+					}
+					slice1 += '--offset:' + (i * 10.90909 + 2.6) + '; --value: 5.554545" countries="' + countries.join(" > ") + '"></div>';
+					
+					var slice2 = '<div class="slice" style="';
+					currentSection = 0;
+					if (slices[i-1].length == 0) {
+						// inserting an empty slice (for the "show grid" mode)
+						for (var j=0; j<sliceSize; j++) {
+							slice2 += '--color' + j + ': transparent; '
+						}
+					} else {
+						for (var j=0; j<slices[i-1].length; j++) {
+							for (var k=0; k<slices[i-1][j]["sections"]; k++) {
+								currentSection += 1;
+								var color = slices[i-1].length > 0 ? cities[slices[i-1][j].city].colors[1] : "transparent";
+								slice2 += '--color' + currentSection + ': ' + color + '; ';
+							}
+						}
+					}
+					slice2 += '--offset:' + (i * 10.90909 + 2.6 + 5.454545) + '; --value: 5.654545" countries="' + countries.join(" > ") + '"><label class="label"><span style="background-color: rgba(255, 255, 255, 0.5)">' + countries.join(" > ") + '</span></label></div>';
+
+					$("#logo").append(slice1);
+					$("#logo").append(slice2);
+				}
+			}
+
+			function drawGrid(sliceSize) {
+				var grid = '<div id="grid">';
+				for (var i=1; i<sliceSize; i++) {
+					var size = ($(".circle").height() / sliceSize) * i;
+					grid += '<div class="separator" style="width: ' + size + 'px; height: ' + size + 'px;"></div>'
+				}
+				grid += '</div>';
+				$("#logo").append(grid);
+			}
+
+			function generateSlices(hostCity, sliceSize, shiftSections) {
+				var countriesPerSlice = Array(33);
+				for (var i=0; i < 33; i++) {
+					countriesPerSlice[i] = Array();
+				}
+				var slices = Array(33);
+				for (var i=0; i < 33; i++) {
+					slices[i] = Array();
+				}
+				var SLICE_LENGTH = 10.9091; // slice length in degrees; approximation of 360/33 (33 being the number of slices on the official 2021 logo)
+				
+				// assign capital cities to the slice on which they appear
+				for (const [city, value] of Object.entries(cities)) {
+					if (city == "Rotterdam" || city == hostCity) continue;
+
+					var angle = angleBetween2Cities(hostCity, city);
+					var sliceNumber = Math.floor(angle / SLICE_LENGTH) -1;
+					if (sliceNumber < 0) {
+						sliceNumber = 0;
+					}
+					var slice = countriesPerSlice[sliceNumber]
+					slice.push({"city": city, "country": cities[city].code, "angle": angle});
+					countriesPerSlice.splice(sliceNumber, 1, slice);
+				}
+
+				for (var i=0; i < countriesPerSlice.length; i++) {
+					var countries = [];
+					// compute distance from host city for each city on the slice
+					for (var j=0; j<countriesPerSlice[i].length; j++) {
+						var dist = distanceInKmBetweenTwoCities(hostCity, countriesPerSlice[i][j].city);
+						countries.push({"city": countriesPerSlice[i][j].city, "country": countriesPerSlice[i][j].country, "distance": dist, "angle": countriesPerSlice[i][j].angle});
+					}
+
+					if (countries.length == 0) {
+						continue;
+					}
+
+					// sort by distance to host city
+					countries.sort(function(d1, d2) {
+						if (d1.distance > d2.distance) {
+							return 1;
+						}
+						if (d1.distance < d2.distance) {
+							return -1;
+						}
+						return 0;
+					});
+					generateSectionSizesForSlice(countries, sliceSize);
+
+					slices[i] = countries;
+				}
+
+				// the shiftSections parameter indicates whether we should shift a country's sections to a neighbouring slide to make the logo more compact
+				if (shiftSections) {
+					// iterating over all slices to move the remaining extra sections to a neighbouring slice
+					for (var i=0; i<slices.length; i++) {
+						var slice = slices[i];
+						if (slice.length == 0) continue;
+
+						var sliceSections = slice.reduce( (prev, cur) => prev + cur.sections, 0);
+						if (sliceSections <= sliceSize) continue;
+
+						// sort by angle, to start moving sections to the previous/next slice based on which capital city is the closest to that slide
+						slice.sort(function(d1, d2) {
+							if (d1.angle > d2.angle) {
+								return 1;
+							}
+							if (d1.angle < d2.angle) {
+								return -1;
+							}
+							return 0;
+						});
+
+						var previousSlice = (i > 0 ? slices[i-1] : slices[slices.length -1]);
+						var nextSlice = (i < slices.length -1 ? slices[i+1] : slices[0]);
+						var previousSliceSections = previousSlice.reduce( (prev, cur) => prev + cur.sections, 0);
+						var nextSliceSections = nextSlice.reduce( (prev, cur) => prev + cur.sections, 0);
+						var hasPreviousSliceChanged = false;
+						var hasNextSliceChanged = false;
+
+						// if previous slice isn't empty and next slide is, start with previous slice
+						if (previousSliceSections > 0 && nextSliceSections == 0) {
+							for (var nb_sections=previousSliceSections; nb_sections<sliceSize && sliceSections>sliceSize; nb_sections++, sliceSections--) {
+								previousSlice.push(slice[0]);
+								previousSlice[previousSlice.length-1].sections = 1;
+								slice.splice(0,1);
+								hasPreviousSliceChanged = true;
+							}
+
+							for (var nb_sections=nextSliceSections; nb_sections<sliceSize && sliceSections>sliceSize; nb_sections++, sliceSections--) {
+								nextSlice.push(slice[slice.length-1]);
+								nextSlice[nextSlice.length-1].sections = 1;
+								slice.splice(slice.length-1,1);
+								hasNextSliceChanged = true;
+							}
+						// else start with next slice
+						} else {
+							for (var nb_sections=nextSliceSections; nb_sections<sliceSize && sliceSections>sliceSize; nb_sections++, sliceSections--) {
+								nextSlice.push(slice[slice.length-1]);
+								nextSlice[nextSlice.length-1].sections = 1;
+								slice.splice(slice.length-1,1);
+								hasNextSliceChanged = true;
+							}
+
+							for (var nb_sections=previousSliceSections; nb_sections<sliceSize && sliceSections>sliceSize; nb_sections++, sliceSections--) {
+								previousSlice.push(slice[0]);
+								previousSlice[previousSlice.length-1].sections = 1;
+								slice.splice(0,1);
+								hasPreviousSliceChanged = true;
+							}
+
+						}
+
+						// re-sort by distance to host city
+						slice.sort(function(d1, d2) {
+							if (d1.distance > d2.distance) {
+								return 1;
+							}
+							if (d1.distance < d2.distance) {
+								return -1;
+							}
+							return 0;
+						});
+						// recompute sections size
+						generateSectionSizesForSlice(slice, sliceSize);
+
+						if (hasPreviousSliceChanged) {
+							previousSlice.sort(function(d1, d2) {
+								if (d1.distance > d2.distance) {
+									return 1;
+								}
+								if (d1.distance < d2.distance) {
+									return -1;
+								}
+								return 0;
+							});
+							// recompute sections size
+							generateSectionSizesForSlice(previousSlice, sliceSize);
+						}
+
+						if (hasNextSliceChanged) {
+							nextSlice.sort(function(d1, d2) {
+								if (d1.distance > d2.distance) {
+									return 1;
+								}
+								if (d1.distance < d2.distance) {
+									return -1;
+								}
+								return 0;
+							});
+							// recompute sections size
+							generateSectionSizesForSlice(nextSlice, sliceSize);
+						}
+					}
+				}
+				return slices;
+			}
+
+			function generateLogo(hostCity, minimumSliceSize, shiftSections) {
+				var slices = generateSlices(hostCity, minimumSliceSize, false);
+
+				var maxSectionsOnASlice = Math.max.apply(Math, (slices.filter(s => s.length > 0).map(arr => arr.map(s => s.sections).reduce((prev, next) => prev+next))));
+				var actualMinimumSliceSize = Math.ceil(minimumSliceSize + (maxSectionsOnASlice - minimumSliceSize) / 2);
+				slices = generateSlices(hostCity, actualMinimumSliceSize);
+
+				var step = Math.round((45/actualMinimumSliceSize) * 10) / 10;
+				var cssString = "radial-gradient(circle at 50% 0%, var(--color1, transparent) 0, ";
+				for (var i=step, j=1; j<actualMinimumSliceSize; i+=step, j+=1) {
+					cssString += "var(--color" + Math.floor(j) + ", transparent) " + i + "%, var(--color" + Math.floor(j+1) + ", transparent) " + i + "%, ";
+				}
+				cssString += "var(--color" + actualMinimumSliceSize + ", transparent) 100%)";
+				$("head").append("<style>.slice:before{background:" + cssString + "}</style>")
+
+				$("#logo").empty();
+				drawSlices(slices);
+				return actualMinimumSliceSize;
+			}
+
+			function drawLogo(slices, sliceSize) {
+				var step = Math.round((45/sliceSize) * 10) / 10;
+				var cssString = "radial-gradient(circle at 50% 0%, var(--color1, transparent) 0, ";
+				for (var i=step, j=1; j<sliceSize; i+=step, j+=1) {
+					cssString += "var(--color" + Math.floor(j) + ", transparent) " + i + "%, var(--color" + Math.floor(j+1) + ", transparent) " + i + "%, ";
+				}
+				cssString += "var(--color" + sliceSize + ", transparent) 100%)";
+				$("#slice-style").remove();
+				$("head").append("<style id='slice-style'>.slice:before{background:" + cssString + "}</style>");
+
+				$("#logo").empty();
+				drawSlices(slices, sliceSize);
+				drawGrid(sliceSize);
+				$("#grid").css("display", $("#chk-show-grid").prop('checked') ? "block" : "none");
+				$(".label").css("display", $("#chk-show-labels").prop('checked') ? "block" : "none");
+			}
+
+			function drawInitialLogo(hostCity, minimumSliceSize, defaultSliceSize, maximumSliceSize) {
+				var sliceSize = minimumSliceSize - 1;
+				var slices;
+				var maxSectionsOnASlice;
+
+				do {
+					sliceSize++;
+					slices = generateSlices(hostCity, sliceSize, true);
+					maxSectionsOnASlice = Math.max.apply(Math, (slices.filter(s => s.length > 0).map(arr => arr.map(s => s.sections).reduce((prev, next) => prev+next))));
+				} while (maxSectionsOnASlice > sliceSize);
+				
+				var actualMinimumSliceSize = sliceSize;
+				if (actualMinimumSliceSize < defaultSliceSize) {
+					sliceSize = defaultSliceSize;
+					slices = generateSlices(hostCity, sliceSize, true);
+				}
+
+				drawLogo(slices, sliceSize);
+				
+				$("#rng-sections").attr("min", actualMinimumSliceSize);
+				$("#rng-sections").attr("max", maximumSliceSize);
+				$("#rng-sections").val(sliceSize);
+				$("#rng-sections-value").html(sliceSize);
+			}
+
+			$(function() {
+				var hostCity = "Rotterdam";
+				var defaultSliceSize = 7; // the number of sections on the official logo
+				var minimumSliceSize = 6;
+				var maximumSliceSize = 15;
+
+				$(document).on("input", "#rng-sections", function() {
+					var sliceSize = parseInt($(this).val())
+					var slices = generateSlices(hostCity, sliceSize, true);
+					drawLogo(slices, sliceSize);
+					$("#rng-sections-value").html(sliceSize);
+				});
+
+				$("#sel-host-city").change(function() {
+					var city = $(this).val();
+					hostCity = city;
+					drawInitialLogo(city, minimumSliceSize, defaultSliceSize, maximumSliceSize);
+				});
+
+				$("#chk-show-grid").change(function() {
+					$("#grid-style").remove();
+					$("head").append("<style id='grid-style'>.slice:after{display: " + ($(this).prop('checked') ? "block" : "none") + "}</style>");
+					$(".circle").css("border", $(this).prop('checked') ? "1px dashed #a0a0a0" : "none");
+					$("#grid").css("display", $(this).prop('checked') ? "block" : "none");
+				});
+
+				$("#chk-show-labels").change(function() {
+					$(".label").css("display", $(this).prop('checked') ? "block" : "none");
+				});
+
+				$("#chk-show-grid").prop('checked', false);
+				$("#chk-show-labels").prop('checked', false);
+				drawInitialLogo(hostCity, minimumSliceSize, defaultSliceSize, maximumSliceSize);
+
+				var cityList = Object.keys(cities).sort();
+				cityList.forEach(city => $("#sel-host-city").append('<option value="' + city + '"">' + city + '</option>'));
+				$("#sel-host-city").val(hostCity);
+			});
+		</script>
+		<link rel="preconnect" href="https://fonts.gstatic.com">
+		<link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet">
+	</head>
+
+	 <body>
+	 	<div id="commands">
+	 		<label for="sel-host-city">Host city</label><br>
+			<select name="hostCity" id="sel-host-city"></select><br><br>
+	 		<label for="rng-sections">Number of sections: </label>
+	 		<span id="rng-sections-value"></span><br>
+ 			<input type="range" min="7" max="13" value="7" id="rng-sections"/><br>
+  			<label for="show-grid">Show grid (laggy)</label>
+ 			<input type="checkbox" id="chk-show-grid" name="show-grid"/><br>
+  			<label for="show-grid">Show country labels</label>
+ 			<input type="checkbox" id="chk-show-labels" name="show-labels"/><br>
+	 	</div>
+	 	<div class="circle" id="logo">
+	 		<div id="grid"></div>
+		</div>
+	</body>
+</html>
