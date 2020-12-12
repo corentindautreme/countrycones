@@ -461,8 +461,8 @@
 			}
 
 			function drawLogo(slices, sliceSize) {
-				var step = Math.round((45/sliceSize) * 10) / 10;
-				var cssString = "radial-gradient(circle at 50% 0%, var(--color1, transparent) 0, ";
+				var step = 100/sliceSize;
+				var cssString = "radial-gradient(farthest-side at 50% 0%, var(--color1, transparent) 0, ";
 				for (var i=step, j=1; j<sliceSize; i+=step, j+=1) {
 					cssString += "var(--color" + Math.floor(j) + ", transparent) " + i + "%, var(--color" + Math.floor(j+1) + ", transparent) " + i + "%, ";
 				}
