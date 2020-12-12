@@ -26,12 +26,12 @@
 	.slice:before {
 		width: 100%;
 		height: 100%;
-		background: radial-gradient(circle at 50% 0%,
+		background: radial-gradient(50% 50% at 50% 0, 
 			var(--color1, white) 0,
-			var(--color1, white) 16%,
-			var(--color2, white) 16%,
-			var(--color2, white) 33%,
-			var(--color3, white) 33%,
+			var(--color1, white) 33.3%,
+			var(--color2, white) 33.3%,
+			var(--color2, white) 66.6%,
+			var(--color3, white) 66.6%,
 			var(--color3, white) 100%
 		);
 		content: '';
@@ -48,32 +48,32 @@
 		<div class="slice" style="--color1: #01aa5a; --color2: #fff; --color3: #fc0000; --offset: 15; --value: 5;"></div>
 		<div class="slice" style="--color1: #ffc832; --color2: #000; --color3: #fc0000; --offset: 19; --value: 9;"></div>
 		<div class="slice" style="--color1: #0750c6; --color2: #fff; --color3: #fc0000; --offset: 27; --value: 13;"></div>
-		<div class="slice" style="--color1: #0750c6; --color2: #ffc832; --color3: #0750c6; --offset: 39; --value: 5;"></div>
+		<div class="slice" style="--color1: #0750c6; --color2: #ffc832; --color3: #0750c6; --offset: 39; --value: 4;"></div>
 
 		<div class="slice" style="--color1: #fff; --color2: #0750c6; --color3: #fc0000; --offset: 48; --value: 5;"></div>
 		<div class="slice" style="--color1: #1ac0f8; --color2: #fff; --color3: #fc0000; --offset: 52; --value: 5;"></div>
-		<div class="slice" style="--color1: #1ac0f8; --color2: #fff; --color3: #ffc832; --offset: 56; --value: 5;"></div>
+		<div class="slice" style="--color1: #1ac0f8; --color2: #fff; --color3: #ffc832; --offset: 56; --value: 4;"></div>
 
 		<div class="slice" style="--color1: #01aa5a; --color2: #fc0000; --color3: #fc0000; --offset: 68; --value: 5;"></div>
-		<div class="slice" style="--color1: #01aa5a; --color2: #fff; --color3: #ff8c32; --offset: 72; --value: 5;"></div>
+		<div class="slice" style="--color1: #01aa5a; --color2: #fff; --color3: #ff8c32; --offset: 72; --value: 4;"></div>
 
-		<div class="slice" style="--color1: #fff; --color2: #fff; --color3: #fc0000; --offset: 104; --value: 5;"></div>
+		<div class="slice" style="--color1: #fff; --color2: #fff; --color3: #fc0000; --offset: 104; --value: 4;"></div>
 
 		<div class="slice" style="--color1: #fff; --color2: #1ac0f8; --color3: #fff; --offset: 113; --value: 5;"></div>
-		<div class="slice" style="--color1: #0750c6; --color2: #fff; --color3: #0750c6; --offset: 117; --value: 5;"></div>
+		<div class="slice" style="--color1: #0750c6; --color2: #fff; --color3: #0750c6; --offset: 117; --value: 4;"></div>
 
-		<div class="slice" style="--color1: #fff; --color2: #ff8c32; --color3: #fff; --offset: 148; --value: 5;"></div>
+		<div class="slice" style="--color1: #fff; --color2: #ff8c32; --color3: #fff; --offset: 148; --value: 4;"></div>
 
-		<div class="slice" style="--color1: #fff; --color2: #fc0000; --color3: #0750c6; --offset: 170; --value: 5;"></div>
+		<div class="slice" style="--color1: #fff; --color2: #fc0000; --color3: #0750c6; --offset: 170; --value: 4;"></div>
 
 		<div class="slice" style="--color1: #fff; --color2: #0750c6; --color3: #fc0000; --offset: 202; --value: 9;"></div>
 		<div class="slice" style="--color1: #0750c6; --color2: #fff; --color3: #000; --offset: 210; --value: 5;"></div>
 		<div class="slice" style="--color1: #0750c6; --color2: #fff; --color3: #fc0000; --offset: 214; --value: 9;"></div>
-		<div class="slice" style="--color1: #01aa5a; --color2: #ffc832; --color3: #fc0000; --offset: 222; --value: 9;"></div>
+		<div class="slice" style="--color1: #01aa5a; --color2: #ffc832; --color3: #fc0000; --offset: 222; --value: 8;"></div>
 
-		<div class="slice" style="--color1: #fc0000; --color2: #ffc832; --color3: #fc0000; --offset: 242; --value: 5;"></div>
+		<div class="slice" style="--color1: #fc0000; --color2: #ffc832; --color3: #fc0000; --offset: 242; --value: 4;"></div>
 
-		<div class="slice" style="--color1: #be0000; --color2: #fff; --color3: #be0000; --offset: 251; --value: 5;"></div>
+		<div class="slice" style="--color1: #be0000; --color2: #fff; --color3: #be0000; --offset: 251; --value: 4;"></div>
 
 		<div class="slice" style="--color1: #ffc832; --color2: #ffc832; --color3: #1ac0f8; --offset: 263; --value: 5;"></div>
 		<div class="slice" style="--color1: #fc0000; --color2: #000; --color3: #fc0000; --offset: 267; --value: 5;"></div>
@@ -83,9 +83,9 @@
 		<div class="slice" style="--color1: #ffc832; --color2: #0750c6; --color3: #fc0000; --offset: 283; --value: 5;"></div>
 		<div class="slice" style="--color1: #0750c6; --color2: #fff; --color3: #fc0000; --offset: 287; --value: 13;"></div>
 		<div class="slice" style="--color1: #01aa5a; --color2: #fc0000; --color3: #1ac0f8; --offset: 299; --value: 5;"></div>
-		<div class="slice" style="--color1: #01aa5a; --color2: #fff; --color3: #1ac0f8; --offset: 303; --value: 5;"></div>
+		<div class="slice" style="--color1: #01aa5a; --color2: #fff; --color3: #1ac0f8; --offset: 303; --value: 4;"></div>
 
-		<div class="slice" style="--color1: #fc0000; --color2: #fff; --color3: #0750c6; --offset: 337; --value: 5;"></div>
+		<div class="slice" style="--color1: #fc0000; --color2: #fff; --color3: #0750c6; --offset: 337; --value: 4;"></div>
 	</div>
 
  	<!-- extended version -->
@@ -105,37 +105,36 @@
 		<div class="slice" style="--color1: #1ac0f8; --color2: #fff; --color3: #ffc832; --offset: 55; --value: 5;"></div> -->
 		<!-- Yugoslavia 1961 -> changing the light blue to a darker shadde, it didn't match Finland's flag anyway -->
 		<div class="slice" style="--color1: #0750c6; --color2: #fff; --color3: #fc0000; --offset: 51; --value: 5;"></div>
-		<div class="slice" style="--color1: #0750c6; --color2: #fff; --color3: #ffc832; --offset: 55; --value: 5;"></div>
+		<div class="slice" style="--color1: #0750c6; --color2: #fff; --color3: #ffc832; --offset: 55; --value: 4;"></div>
 
 		<div class="slice" style="--color1: #01aa5a; --color2: #fc0000; --color3: #fc0000; --offset: 68; --value: 5;"></div>
-		<div class="slice" style="--color1: #01aa5a; --color2: #fff; --color3: #ff8c32; --offset: 72; --value: 5;"></div>
+		<div class="slice" style="--color1: #01aa5a; --color2: #fff; --color3: #ff8c32; --offset: 72; --value: 4;"></div>
 
-		<div class="slice" style="--color1: #fff; --color2: #fff; --color3: #fc0000; --offset: 104; --value: 5;"></div>
+		<div class="slice" style="--color1: #fff; --color2: #fff; --color3: #fc0000; --offset: 104; --value: 4;"></div>
 
 		<div class="slice" style="--color1: #fff; --color2: #1ac0f8; --color3: #fff; --offset: 113; --value: 5;"></div>
-		<div class="slice" style="--color1: #0750c6; --color2: #fff; --color3: #0750c6; --offset: 117; --value: 5;"></div>
+		<div class="slice" style="--color1: #0750c6; --color2: #fff; --color3: #0750c6; --offset: 117; --value: 4;"></div>
 		<!-- Turkey 1975 -->
-		<div class="slice" style="--color1: #fc0000; --color2: #fc0000; --color3: #fff; --offset: 121; --value: 5;"></div>
+		<div class="slice" style="--color1: #fc0000; --color2: #fc0000; --color3: #fff; --offset: 121; --value: 4;"></div>
 
 		<!-- Morocco 1980 -->
 		<div class="slice" style="--color1: #01aa5a; --color2: #fc0000; --color3: #fc0000; --offset: 145; --value: 5;"></div>
-		<div class="slice" style="--color1: #fff; --color2: #ff8c32; --color3: #fff; --offset: 149; --value: 5;"></div>
+		<div class="slice" style="--color1: #fff; --color2: #ff8c32; --color3: #fff; --offset: 149; --value: 4;"></div>
 
-		<div class="slice" style="--color1: #fff; --color2: #fc0000; --color3: #0750c6; --offset: 171; --value: 5;"></div>
+		<div class="slice" style="--color1: #fff; --color2: #fc0000; --color3: #0750c6; --offset: 171; --value: 4;"></div>
 
 		<!-- Bosnia & Herzegovina 1993 -->
 		<div class="slice" style="--color1: #0750c6; --color2: #ffc832; --color3: #0750c6; --offset: 199; --value: 5;"></div>
 		<div class="slice" style="--color1: #fff; --color2: #0750c6; --color3: #fc0000; --offset: 203; --value: 9;"></div>
 		<div class="slice" style="--color1: #0750c6; --color2: #fff; --color3: #000; --offset: 211; --value: 5;"></div>
 		<div class="slice" style="--color1: #0750c6; --color2: #fff; --color3: #fc0000; --offset: 215; --value: 9;"></div>
-		<div class="slice" style="--color1: #01aa5a; --color2: #ffc832; --color3: #fc0000; --offset: 223; --value: 9;"></div>
+		<div class="slice" style="--color1: #01aa5a; --color2: #ffc832; --color3: #fc0000; --offset: 223; --value: 8;"></div>
 
-		<div class="slice" style="--color1: #fc0000; --color2: #ffc832; --color3: #fc0000; --offset: 243; --value: 5;"></div>
+		<div class="slice" style="--color1: #fc0000; --color2: #ffc832; --color3: #fc0000; --offset: 243; --value: 4;"></div>
 
-		<div class="slice" style="--color1: #be0000; --color2: #fff; --color3: #be0000; --offset: 251; --value: 5;"></div>
+		<div class="slice" style="--color1: #be0000; --color2: #fff; --color3: #be0000; --offset: 251; --value: 4;"></div>
 
 		<div class="slice" style="--color1: #ffc832; --color2: #ffc832; --color3: #1ac0f8; --offset: 263; --value: 5;"></div>
-		
 		<div class="slice" style="--color1: #fc0000; --color2: #000; --color3: #fc0000; --offset: 267; --value: 5;"></div>
 		<div class="slice" style="--color1: #fc0000; --color2: #01aa5a; --color3: #fc0000; --offset: 271; --value: 5;"></div>
 		<!-- Andora and Serbia & Montenegro 2004 -->
@@ -147,13 +146,13 @@
 		<!-- <div class="slice" style="--color1: #0750c6; --color2: #fff; --color3: #fc0000; --offset: 287; --value: 13;"></div> -->
 		<!-- 2007 v2 - Serbia, Czechia, Georgia + adding yellow for Montenegro -->
 		<div class="slice" style="--color1: #0750c6; --color2: #fff; --color3: #fc0000; --offset: 291; --value: 9;"></div>
-		<div class="slice" style="--color1: #fc0000; --color2: #ffc832; --color3: #fc0000; --offset: 299; --value: 5;"></div>
+		<div class="slice" style="--color1: #fc0000; --color2: #ffc832; --color3: #fc0000; --offset: 299; --value: 4;"></div>
 		<!-- end 2007 v2 -->
 		<div class="slice" style="--color1: #01aa5a; --color2: #fc0000; --color3: #1ac0f8; --offset: 303; --value: 5;"></div>
-		<div class="slice" style="--color1: #01aa5a; --color2: #fff; --color3: #1ac0f8; --offset: 307; --value: 5;"></div>
+		<div class="slice" style="--color1: #01aa5a; --color2: #fff; --color3: #1ac0f8; --offset: 307; --value: 4;"></div>
 
 		<!-- <div class="slice" style="--color1: #fc0000; --color2: #fff; --color3: #0750c6; --offset: 337; --value: 5;"></div> -->
 		<!-- Australia 2015 - v2 -->
-		<div class="slice" style="--color1: #fff; --color2: #0750c6; --color3: #0750c6; --offset: 339; --value: 5;"></div>
+		<div class="slice" style="--color1: #fff; --color2: #0750c6; --color3: #0750c6; --offset: 339; --value: 4;"></div>
 	</div>
 </body>
