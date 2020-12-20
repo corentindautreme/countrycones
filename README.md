@@ -2,8 +2,6 @@
 
 #### Live demo on [CodePen](https://codepen.io/Co_is_tired_of_his_username_being_taken/pen/PowpmVe)
 
-#### TODO rewrite and include 2021
-
 I found the concept behind the logo of the 2020 Eurovision Song Contest really interesting and creative, so much that I wanted to give a go at recreating it using CSS and maybe tweak it a little bit (why was the Australian flag represented like that anyway).
 
 I was aware CSS had come a pretty long way over the last decade but I'm not exactly a frontend expert sadly - so I needed help.
