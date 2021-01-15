@@ -1,0 +1,684 @@
+<html>
+	<head>
+		<style type="text/css">
+			html {
+				width: 100%;
+				height: 100%;
+			    background-size: cover;
+				background: #dadada;
+				background: #030b27;
+				background: linear-gradient(20deg, #392556, #200c53 70%);
+				background-attachment: fixed;
+				font-family: 'Montserrat', sans-serif;
+			}
+
+			#commands {
+				position: absolute;
+				margin: 1em;
+				color: white;
+                z-index: 10;
+			}
+
+			.circle {
+				position: relative;
+				margin: 0 auto;
+				margin-top: 50px;
+				width: 900px;
+				height: 900px;
+				overflow: hidden;
+				border-radius: 100%;
+			}
+
+			#grid {
+				position: absolute;
+				width: 100%;
+				height: 100%;
+		        display: none;
+				z-index: 5;
+			}
+
+			#grid .separator {
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				transform: translate(-50%, -50%);
+				border: 1px dashed #a0a0a0;
+				border-radius: 100%;
+			}
+
+			.slice {
+				position: absolute;
+				width: 100%;
+				height: 100%;
+				overflow: hidden;
+				transform: translate(0, -50%) rotate(90deg) rotate(calc(var(--offset, 0) * 1deg));
+				transform-origin: 50% 100%;
+			}
+
+			.slice:before {
+				position: absolute;
+				width: 100%;
+				height: 100%;
+				content: '';
+				transform: translate(0, 100%) rotate(calc(var(--value, 45) * 1deg));
+				transform-origin: 50% 0;
+			}
+
+			.slice:after {
+		        position: absolute;
+		        bottom: 0;
+		        width: 50%;
+		        display: none;
+		        content: '';
+		        border-top: 1px dashed #a0a0a0;
+		    }
+
+			.label {
+				position: absolute;
+				bottom: 0;
+				right: 0;
+				width: 50%;
+				display: none;
+				font-size: 14px;
+				text-align: right;
+				transform: translate(0, 50%) rotate(calc(var(--value, 45)/2 * 1deg + 180deg));
+				transform-origin: 0 50%;
+			}
+		</style>
+
+		<script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+
+		<script>
+			var cities = {
+				"Tirana": {"lat": 41.31666667, "lon": 19.816667},
+				"Yerevan": {"lat": 40.16666667, "lon": 44.5},
+				"Canberra": {"lat": -35.26666667, "lon": 149.133333},
+				"Vienna": {"lat": 48.2, "lon": 16.366667},
+				"Baku": {"lat": 40.38333333, "lon": 49.866667},
+				"Minsk": {"lat": 53.9, "lon": 27.566667},
+				"Brussels": {"lat": 50.83333333, "lon": 4.333333},
+                "Sarajevo": {"lat": 43.8563, "lon": 18.4131},
+				"Sofia": {"lat": 42.68333333, "lon": 23.316667},
+				"Zagreb": {"lat": 45.8, "lon": 16},
+				"Nicosia": {"lat": 35.16666667, "lon": 33.366667},
+				"Prague": {"lat": 50.08333333, "lon": 14.466667},
+				"Copenhagen": {"lat": 55.66666667, "lon": 12.583333},
+				"Tallinn": {"lat": 59.43333333, "lon": 24.716667},
+				"Helsinki": {"lat": 60.16666667, "lon": 24.933333},
+				"Cannes": {"lat": 43.5528, "lon": 7.0174},
+				"Paris": {"lat": 48.86666667, "lon": 2.333333},
+				"Tbilisi": {"lat": 41.68333333, "lon": 44.833333},
+				"Berlin": {"lat": 52.51666667, "lon": 13.4},
+				"Düsseldorf": {"lat": 51.2277, "lon": 6.7735},
+				"Munich": {"lat": 48.135, "lon": 11.5820},
+				"Frankfurt-am-Main": {"lat": 50.1109, "lon": 8.6821},
+				"Athens": {"lat": 37.98333333, "lon": 23.733333},
+				"Reykjavik": {"lat": 64.15, "lon": -21.95},
+				"Dublin": {"lat": 53.31666667, "lon": -6.233333},
+				"Milstreet": {"lat": 52.0601, "lon": 9.0647},
+				"Jerusalem": {"lat": 31.76666667, "lon": 35.233333},
+				"Tel Aviv": {"lat": 32.0853, "lon": 34.7818},
+				"Naples": {"lat": 40.8518, "lon": 14.2681},
+				"Rome": {"lat": 41.9, "lon": 12.483333},
+				"Riga": {"lat": 56.95, "lon": 24.1},
+				"Vilnius": {"lat": 54.68333333, "lon": 25.316667},
+				"Luxembourg": {"lat": 49.8153, "lon": 6.1296},
+				"Valletta": {"lat": 35.88333333, "lon": 14.5},
+				"Chisinau": {"lat": 47, "lon": 28.85},
+				"Monaco": {"lat": 43.7384, "lon": 7.4246},
+				"Amsterdam": {"lat": 52.3676, "lon": 4.9041},
+				"Hilversum": {"lat": 52.2292, "lon": 5.1669},
+				"Rotterdam": {"lat": 51.9244, "lon": 4.4777},
+				"The Hague": {"lat": 52.0705, "lon": 4.3007},
+				"Skopje": {"lat": 42, "lon": 21.433333},
+				"Bergen": {"lat": 60.3913, "lon": 5.3221},
+				"Oslo": {"lat": 59.91666667, "lon": 10.75},
+				"Warsaw": {"lat": 52.25, "lon": 21},
+				"Lisbon": {"lat": 38.71666667, "lon": -9.133333},
+				"Bucharest": {"lat": 44.43333333, "lon": 26.1},
+				"Moscow": {"lat": 55.75, "lon": 37.6},
+				"San Marino": {"lat": 43.93333333, "lon": 12.416667},
+				"Belgrade": {"lat": 44.83333333, "lon": 20.5},
+				"Ljubljana": {"lat": 46.05, "lon": 14.516667},
+				"Madrid": {"lat": 40.4, "lon": -3.683333},
+				"Göteborg": {"lat": 57.7089, "lon": 11.9746},
+				"Malmö": {"lat": 55.6059, "lon": 13.0007},
+				"Stockholm": {"lat": 59.33333333, "lon": 18.05},
+				"Lausanne": {"lat": 46.5197, "lon": 6.6323},
+				"Lugano": {"lat": 46.0037, "lon": 8.9511},
+				"Kyiv": {"lat": 50.43333333, "lon": 30.516667},
+				"Birmingham": {"lat": 52.4862, "lon": 1.8904},
+				"Brighton": {"lat": 50.8225, "lon": 0.1372},
+				"Edinburgh": {"lat": 55.9533, "lon": 3.1883},
+				"Harrogate": {"lat": 53.9921, "lon": 1.5418},
+				"London": {"lat": 51.5, "lon": -0.083333},
+				"Ankara": {"lat": 39.9334, "lon": 32.8597},
+				"Istanbul": {"lat": 41.0082, "lon": 28.9784}
+			};
+			var countries = {
+				"AL": {"lat": 41.31666667, "lon": 19.816667, "colors": ["#fc0000", "#fc0000"]},
+				"AD": {"lat": 42.5063, "lon": 1.5218, "colors": ["#0750c6", "#ffc732"]},
+				"AM": {"lat": 40.16666667, "lon": 44.5, "colors": ["#fc0000", "#0750c6"]},
+				"AU": {"lat": -35.26666667, "lon": 149.133333, "colors": ["#0750c6", "#0750c6"]},
+				"AT": {"lat": 48.2, "lon": 16.366667, "colors": ["#fc0000", "#fff"]},
+				"AZ": {"lat": 40.38333333, "lon": 49.866667, "colors": ["#1ac0f8", "#01a95b"]},
+				"BY": {"lat": 53.9, "lon": 27.566667, "colors": ["#fc0000", "#01a95b"]},
+				"BE": {"lat": 50.83333333, "lon": 4.333333, "colors": ["#ffc832", "#fc0000"]},
+                "BA": {"lat": 43.8563, "lon": 18.4131, "colors": ["#0750c6", "#ffc732"]},
+				"BG": {"lat": 42.68333333, "lon": 23.316667, "colors": ["#fff", "#01a95b"]},
+				"HR": {"lat": 45.8, "lon": 16, "colors": ["#fff", "#fc0000"]},
+				"CY": {"lat": 35.16666667, "lon": 33.366667, "colors": ["#ff8c33", "#fff"]},
+				"CZ": {"lat": 50.08333333, "lon": 14.466667, "colors": ["#fff", "#fc0000"]},
+				"DK": {"lat": 55.66666667, "lon": 12.583333, "colors": ["#fc0000", "#fff"]},
+				"EE": {"lat": 59.43333333, "lon": 24.716667, "colors": ["#000", "#0850c6"]},
+				"FI": {"lat": 60.16666667, "lon": 24.933333, "colors": ["#fff", "#1ac0f8"]},
+				"FR": {"lat": 48.86666667, "lon": 2.333333, "colors": ["#fff", "#fc0000"]},
+				"GE": {"lat": 41.68333333, "lon": 44.833333, "colors": ["#fff", "#fc0000"]},
+				"DE": {"lat": 52.51666667, "lon": 13.4, "colors": ["#000", "#fc0000"]},
+				"GR": {"lat": 37.98333333, "lon": 23.733333, "colors": ["#fff", "#0750c6"]},
+				"HU": {"lat": 47.4979, "lon": 19.0402, "colors": ["#fff", "#01a95b"]},
+				"IS": {"lat": 64.15, "lon": -21.95, "colors": ["#0850c6", "#fff"]},
+				"IE": {"lat": 53.31666667, "lon": -6.233333, "colors": ["#01a95b", "#ff8c33"]},
+				"IL": {"lat": 31.76666667, "lon": 35.233333, "colors": ["#fff", "#0750c6"]},
+				"IT": {"lat": 41.9, "lon": 12.483333, "colors": ["#fff", "#fc0000"]},
+				"LV": {"lat": 56.95, "lon": 24.1, "colors": ["#be0000", "#fff"]},
+				"LT": {"lat": 54.68333333, "lon": 25.316667, "colors": ["#ffc732", "#01a95b"]},
+				"LU": {"lat": 49.8153, "lon": 6.1296, "colors": ["#fc0000", "#1ac0f8"]},
+				"MT": {"lat": 35.88333333, "lon": 14.5, "colors": ["#fff", "#fc0000"]},
+				"MD": {"lat": 47.0105, "lon": 28.8638, "colors": ["#1ac0f8", "#fc0000"]},
+				"MC": {"lat": 43.7384, "lon": 7.4246, "colors": ["#fc0000", "#fff"]},
+				"ME": {"lat": 42.4304, "lon": 19.2594, "colors": ["#fc0000", "#ffc832"]},
+				"NL": {"lat": 52.3676, "lon": 4.9041, "colors": ["#fff", "#fc0000"]},
+				"MK": {"lat": 41.9981, "lon": 21.4254, "colors": ["#fc0000", "#ffc832"]},
+				"MA": {"lat": 33.9716, "lon": 6.8498, "colors": ["#fc0000", "#01a95b"]},
+				"NO": {"lat": 59.91666667, "lon": 10.75, "colors": ["#fc0000", "#0750c6"]},
+				"PL": {"lat": 52.25, "lon": 21, "colors": ["#fff", "#fc0000"]},
+				"PT": {"lat": 38.71666667, "lon": -9.133333, "colors": ["#01a95b", "#fc0000"]},
+				"RO": {"lat": 44.43333333, "lon": 26.1, "colors": ["#0750c6", "#ffc732"]},
+				"RU": {"lat": 55.75, "lon": 37.6, "colors": ["#fff", "#fc0000"]},
+				"SM": {"lat": 43.93333333, "lon": 12.416667, "colors": ["#fff", "#1ac0f8"]},
+				"RS": {"lat": 44.83333333, "lon": 20.5, "colors": ["#fff", "#0750c6"]},
+				"CS": {"lat": 44.83333333, "lon": 20.5, "colors": ["#fff", "#0750c6"]},
+				"SK": {"lat": 48.1486, "lon": 17.1077, "colors": ["#fff", "#fc0000"]},
+				"SI": {"lat": 46.0569, "lon": 14.5058, "colors": ["#fff", "#fc0000"]},
+				"ES": {"lat": 40.4, "lon": -3.683333, "colors": ["#fc0000", "#ffc832"]},
+				"SE": {"lat": 59.33333333, "lon": 18.05, "colors": ["#0750c6", "#ffc832"]},
+				"CH": {"lat": 46.91666667, "lon": 7.466667, "colors": ["#fc0000", "#fff"]},
+				"UA": {"lat": 50.43333333, "lon": 30.516667, "colors": ["#1ac0f8", "#ffc732"]},
+				"UK": {"lat": 51.5, "lon": -0.083333, "colors": ["#0750c6", "#fc0000"]},
+				"TR": {"lat": 39.9334, "lon": 32.8597, "colors": ["#fc0000", "#fc0000"]},
+				"YU": {"lat": 44.83333333, "lon": 20.5, "colors": ["#fff", "#0750c6"]}
+			};
+
+			var years = {
+				"1956": { "host": "Lugano", "participants": ["BE", "FR", "DE", "IT", "LU", "NL", "CH"] },
+				"1957": { "host": "Frankfurt-am-Main", "participants": ["AT", "BE", "DK", "FR", "DE", "IT", "LU", "NL", "CH", "UK"] },
+				"1958": { "host": "Hilversum", "participants": ["AT", "BE", "DK", "FR", "DE", "IT", "LU", "NL", "SE", "CH"] },
+				"1959": { "host": "Cannes", "participants": ["AT", "BE", "DK", "FR", "DE", "IT", "MC", "NL", "SE", "CH", "UK"] },
+				"1960": { "host": "London", "participants": ["AT", "BE", "DK", "FR", "DE", "IT", "LU", "MC", "NL", "NO", "SE", "CH", "UK"] },
+				"1961": { "host": "Cannes", "participants": ["AT", "BE", "DK", "FI", "FR", "DE", "IT", "LU", "MC", "NL", "NO", "ES", "SE", "CH", "UK", "YU"] },
+				"1962": { "host": "Luxembourg", "participants": ["AT", "BE", "DK", "FI", "FR", "DE", "IT", "LU", "MC", "NL", "NO", "ES", "SE", "CH", "UK", "YU"] },
+				"1963": { "host": "London", "participants": ["AT", "BE", "DK", "FI", "FR", "DE", "IT", "LU", "MC", "NL", "NO", "ES", "SE", "CH", "UK", "YU"] },
+				"1964": { "host": "Copenhagen", "participants": ["AT", "BE", "DK", "FI", "FR", "DE", "IT", "LU", "MC", "NL", "NO", "PT", "ES", "CH", "UK", "YU"] },
+				"1965": { "host": "Naples", "participants": ["AT", "BE", "DK", "FI", "FR", "DE", "IE", "IT", "LU", "MC", "NL", "NO", "PT", "ES", "SE", "CH", "UK", "YU"] },
+				"1966": { "host": "Luxembourg", "participants": ["AT", "BE", "DK", "FI", "FR", "DE", "IE", "IT", "LU", "MC", "NL", "NO", "PT", "ES", "SE", "CH", "UK", "YU"] },
+				"1967": { "host": "Vienna", "participants": ["AT", "BE", "FI", "FR", "DE", "IE", "IT", "LU", "MC", "NL", "NO", "PT", "ES", "SE", "CH", "UK", "YU"] },
+				"1968": { "host": "London", "participants": ["AT", "BE", "FI", "FR", "DE", "IE", "IT", "LU", "MC", "NL", "NO", "PT", "ES", "SE", "CH", "UK", "YU"] },
+				"1969": { "host": "Madrid", "participants": ["BE", "FI", "FR", "DE", "IE", "IT", "LU", "MC", "NL", "NO", "PT", "ES", "SE", "CH", "UK", "YU"] },
+				"1970": { "host": "Amsterdam", "participants": ["BE", "FR", "DE", "IE", "IT", "LU", "MC", "NL", "ES", "CH", "UK", "YU"] },
+				"1971": { "host": "Dublin", "participants": ["AT", "BE", "FI", "FR", "DE", "IE", "IT", "LU", "MT", "MC", "NL", "NO", "PT", "ES", "SE", "CH", "UK", "YU"] },
+				"1972": { "host": "Edinburgh", "participants": ["AT", "BE", "FI", "FR", "DE", "IE", "IT", "LU", "MT", "MC", "NL", "NO", "PT", "ES", "SE", "CH", "UK", "YU"] },
+				"1973": { "host": "Luxembourg", "participants": ["BE", "FI", "FR", "DE", "IE", "IL", "IT", "LU", "MC", "NL", "NO", "PT", "ES", "SE", "CH", "UK", "YU"] },
+				"1974": { "host": "Brighton", "participants": ["BE", "FI", "DE", "GR", "IE", "IL", "IT", "LU", "MC", "NL", "NO", "PT", "ES", "SE", "CH", "UK", "YU"] },
+				"1975": { "host": "Stockholm", "participants": ["BE", "FI", "FR", "DE", "IE", "IL", "IT", "LU", "MT", "MC", "NL", "NO", "PT", "ES", "SE", "CH", "TR", "UK", "YU"] },
+				"1976": { "host": "The Hague", "participants": ["AT", "BE", "FI", "FR", "DE", "GR", "IE", "IL", "IT", "LU", "MC", "NL", "NO", "PT", "ES", "CH", "UK", "YU"] },
+				"1977": { "host": "London", "participants": ["AT", "BE", "FI", "FR", "DE", "GR", "IE", "IL", "IT", "LU", "MC", "NL", "NO", "PT", "ES", "SE", "CH", "UK"] },
+				"1978": { "host": "Paris", "participants": ["AT", "BE", "DK", "FI", "FR", "DE", "GR", "IE", "IL", "IT", "LU", "MC", "NL", "NO", "PT", "ES", "SE", "CH", "TR", "UK"] },
+				"1979": { "host": "Jerusalem", "participants": ["AT", "BE", "DK", "FI", "FR", "DE", "GR", "IE", "IL", "IT", "LU", "MC", "NL", "NO", "PT", "ES", "SE", "CH", "UK"] },
+				"1980": { "host": "The Hague", "participants": ["AT", "BE", "DK", "FI", "FR", "DE", "GR", "IE", "IT", "LU", "MA", "NL", "NO", "PT", "ES", "SE", "CH", "TR", "UK"] },
+				"1981": { "host": "Dublin", "participants": ["AT", "BE", "CY", "DK", "FI", "FR", "DE", "GR", "IE", "IL", "LU", "NL", "NO", "PT", "ES", "SE", "CH", "TR", "UK", "YU"] },
+				"1982": { "host": "Harrogate", "participants": ["AT", "BE", "CY", "DK", "FI", "DE", "IE", "IL", "LU", "NL", "NO", "PT", "ES", "SE", "CH", "TR", "UK", "YU"] },
+				"1983": { "host": "Munich", "participants": ["AT", "BE", "CY", "DK", "FI", "FR", "DE", "GR", "IL", "IT", "LU", "NL", "NO", "PT", "ES", "SE", "CH", "TR", "UK", "YU"] },
+				"1984": { "host": "Luxembourg", "participants": ["AT", "BE", "CY", "DK", "FI", "FR", "DE", "IE", "IT", "LU", "NL", "NO", "PT", "ES", "SE", "CH", "TR", "UK", "YU"] },
+				"1985": { "host": "Göteborg", "participants": ["AT", "BE", "CY", "DK", "FI", "FR", "DE", "GR", "IE", "IL", "IT", "LU", "NO", "PT", "ES", "SE", "CH", "TR", "UK"] },
+				"1986": { "host": "Bergen", "participants": ["AT", "BE", "CY", "DK", "FI", "FR", "DE", "IS", "IE", "IL", "LU", "NL", "NO", "PT", "ES", "SE", "CH", "TR", "UK", "YU"] },
+				"1987": { "host": "Brussels", "participants": ["AT", "BE", "CY", "DK", "FI", "FR", "DE", "GR", "IS", "IE", "IL", "IT", "LU", "NL", "NO", "PT", "ES", "SE", "CH", "TR", "UK", "YU"] },
+				"1988": { "host": "Dublin", "participants": ["AT", "BE", "DK", "FI", "FR", "DE", "GR", "IS", "IE", "IL", "IT", "LU", "NL", "NO", "PT", "ES", "SE", "CH", "TR", "UK", "YU"] },
+				"1989": { "host": "Lausanne", "participants": ["AT", "BE", "CY", "DK", "FI", "FR", "DE", "GR", "IS", "IE", "IL", "IT", "LU", "NL", "NO", "PT", "ES", "SE", "CH", "TR", "UK", "YU"] },
+				"1990": { "host": "Zagreb", "participants": ["AT", "BE", "CY", "DK", "FI", "FR", "DE", "GR", "IS", "IE", "IL", "IT", "LU", "NL", "NO", "PT", "ES", "SE", "CH", "TR", "UK", "YU"] },
+				"1991": { "host": "Rome", "participants": ["AT", "BE", "CY", "DK", "FI", "FR", "DE", "GR", "IS", "IE", "IL", "IT", "LU", "MT", "NO", "PT", "ES", "SE", "CH", "TR", "UK", "YU"] },
+				"1992": { "host": "Malmö", "participants": ["AT", "BE", "CY", "DK", "FI", "FR", "DE", "GR", "IS", "IE", "IL", "IT", "LU", "MT", "NL", "NO", "PT", "ES", "SE", "CH", "TR", "UK", "YU"] },
+				"1993": { "host": "Milstreet", "participants": ["AT", "BE", "BA", "HR", "CY", "DK", "FI", "FR", "DE", "GR", "IS", "IE", "IL", "IT", "LU", "MT", "NL", "NO", "PT", "SI", "ES", "SE", "CH", "TR", "UK"] },
+				"1994": { "host": "Dublin", "participants": ["AT", "BA", "HR", "CY", "EE", "FI", "FR", "DE", "GR", "HU", "IS", "IE", "LT", "MT", "NL", "NO", "PL", "PT", "RO", "RU", "SK", "ES", "SE", "CH", "UK"] },
+				"1995": { "host": "Dublin", "participants": ["AT", "BE", "BA", "HR", "CY", "DK", "FR", "DE", "GR", "HU", "IS", "IE", "IL", "MT", "NO", "PL", "PT", "RU", "SI", "ES", "SE", "UK", "TR"] },
+				"1996": { "host": "Oslo", "participants": ["AT", "BE", "BA", "HR", "CY", "EE", "FI", "FR", "GR", "IS", "IE", "MT", "NL", "NO", "PL", "PT", "SK", "SI", "ES", "SE", "CH", "UK", "TR"] },
+				"1997": { "host": "Dublin", "participants": ["AT", "BA", "HR", "CY", "DK", "EE", "FR", "DE", "GR", "HU", "IS", "IE", "IT", "MT", "NL", "NO", "PL", "PT", "RU", "SI", "ES", "SE", "CH", "UK", "TR"] },
+				"1998": { "host": "Birmingham", "participants": ["BE", "HR", "CY", "EE", "FI", "FR", "DE", "GR", "HU", "IE", "IL", "MT", "NL", "MK", "NO", "PL", "PT", "RO", "SK", "SI", "ES", "SE", "CH", "UK", "TR"] },
+				"1999": { "host": "Jerusalem", "participants": ["AT", "BE", "BA", "HR", "CY", "DK", "EE", "FR", "DE", "IE", "IS", "IL", "LT", "MT", "NL", "NO", "PL", "PT", "SI", "ES", "SE", "UK", "TR"] },
+				"2000": { "host": "Stockholm", "participants": ["AT", "BE", "HR", "CY", "DK", "EE", "FI", "FR", "DE", "IE", "IS", "IL", "LV", "MT", "NL", "MK", "NO", "RO", "RU", "ES", "SE", "CH", "UK", "TR"] },
+				"2001": { "host": "Copenhagen", "participants": ["BA", "HR", "DK", "EE", "FR", "DE", "GR", "IE", "IS", "IL", "LV", "LT", "MT", "NL", "NO", "PL", "PT", "RU", "SI", "ES", "SE", "UK", "TR"] },
+				"2002": { "host": "Tallinn", "participants": ["AT", "BE", "BA", "HR", "CY", "DK", "EE", "FI", "FR", "DE", "GR", "IL", "LV", "LT", "MT", "MK", "RO", "RU", "SI", "ES", "SE", "CH", "UK", "TR"] },
+				"2003": { "host": "Riga", "participants": ["AT", "BE", "BA", "HR", "CY", "EE", "FR", "DE", "GR", "IE", "IS", "IL", "LV", "MT", "NL", "NO", "PL", "PT", "RO", "RU", "SI", "ES", "SE", "UA", "UK", "TR"] },
+				"2004": { "host": "Istanbul", "participants": ["AL", "AD", "AT", "BY", "BE", "BA", "HR", "CY", "DK", "EE", "FI", "FR", "DE", "GR", "IE", "IS", "IL", "LV", "LT", "MT", "MC", "NL", "MK", "NO", "PL", "PT", "RO", "RU", "CS", "SI", "ES", "SE", "CH", "UA", "UK", "TR"] },
+				"2005": { "host": "Kyiv", "participants": ["AL", "AD", "AT", "BY", "BE", "BA", "BG", "HR", "CY", "DK", "EE", "FI", "FR", "DE", "GR", "HU", "IE", "IS", "IL", "LV", "LT", "MT", "MD", "MC", "NL", "MK", "NO", "PL", "PT", "RO", "RU", "CS", "SI", "ES", "SE", "CH", "UA", "UK", "TR"] },
+				"2006": { "host": "Athens", "participants": ["AL", "AD", "AM", "BY", "BE", "BA", "BG", "HR", "CY", "DK", "EE", "FI", "FR", "DE", "GR", "IE", "IS", "IL", "LV", "LT", "MT", "MD", "MC", "NL", "MK", "NO", "PL", "PT", "RO", "RU",  "SI", "ES", "SE", "CH", "UA", "UK", "TR"] },
+				"2007": { "host": "Helsinki", "participants": ["AL", "AD", "AM", "AT", "BY", "BE", "BA", "BG", "HR", "CY", "CZ", "DK", "EE", "FI", "FR", "GE", "DE", "GR", "HU", "IE", "IS", "IL", "LV", "LT", "MT", "MD", "ME", "NL", "MK", "NO", "PL", "PT", "RO", "RU", "RS", "SI", "ES", "SE", "CH", "UA", "UK", "TR"] },
+				"2008": { "host": "Belgrade", "participants": ["AL", "AD", "AM", "AZ", "BY", "BE", "BA", "BG", "HR", "CY", "CZ", "DK", "EE", "FI", "FR", "GE", "DE", "GR", "HU", "IE", "IS", "IL", "LV", "LT", "MT", "MD", "ME", "NL", "MK", "NO", "PL", "PT", "RO", "RU", "SM", "RS", "SI", "ES", "SE", "CH", "UA", "UK", "TR"] },
+				"2009": { "host": "Moscow", "participants": ["AL", "AD", "AM", "AZ", "BY", "BE", "BA", "BG", "HR", "CY", "CZ", "DK", "EE", "FI", "FR", "DE", "GR", "HU", "IE", "IS", "IL", "LV", "LT", "MT", "MD", "ME", "NL", "MK", "NO", "PL", "PT", "RO", "RU", "RS", "SK", "SI", "ES", "SE", "CH", "UA", "UK", "TR"] },
+				"2010": { "host": "Oslo", "participants": ["AL", "AM", "AZ", "BY", "BE", "BA", "BG", "HR", "CY", "DK", "EE", "FI", "FR", "GE", "DE", "GR", "IE", "IS", "IL", "LV", "LT", "MT", "MD", "NL", "MK", "NO", "PL", "PT", "RO", "RU", "RS", "SK", "SI", "ES", "SE", "CH", "UA", "UK", "TR"] },
+				"2011": { "host": "Düsseldorf", "participants": ["AT", "AL", "AM", "AZ", "BY", "BE", "BA", "BG", "HR", "CY", "DK", "EE", "FI", "FR", "GE", "DE", "GR", "HU", "IE", "IS", "IL", "IT", "LV", "LT", "MT", "MD", "NL", "MK", "NO", "PL", "PT", "RO", "RU", "RS", "SM", "SK", "SI", "ES", "SE", "CH", "UA", "UK", "TR"] },
+				"2012": { "host": "Baku", "participants": ["AT", "AL", "AZ", "BY", "BE", "BA", "BG", "HR", "CY", "DK", "EE", "FI", "FR", "GE", "DE", "GR", "HU", "IE", "IS", "IL", "IT", "LV", "LT", "MT", "MD", "ME", "NL", "MK", "NO", "PT", "RO", "RU", "RS", "SM", "SK", "SI", "ES", "SE", "CH", "UA", "UK", "TR"] },
+				"2013": { "host": "Malmö", "participants": ["AT", "AL", "AM", "AZ", "BY", "BE", "BG", "HR", "CY", "DK", "EE", "FI", "FR", "GE", "DE", "GR", "HU", "IE", "IS", "IL", "IT", "LV", "LT", "MT", "MD", "ME", "NL", "MK", "NO", "RO", "RU", "RS", "SM", "SI", "ES", "SE", "CH", "UA", "UK"] },
+				"2014": { "host": "Copenhagen", "participants": ["AT", "AL", "AM", "AZ", "BY", "BE", "DK", "EE", "FI", "FR", "GE", "DE", "GR", "HU", "IE", "IS", "IL", "IT", "LV", "LT", "MT", "MD", "ME", "NL", "MK", "NO", "PL", "PT", "RO", "RU", "SM", "SI", "ES", "SE", "CH", "UA", "UK"] },
+				"2015": { "host": "Vienna", "participants": ["AU", "AT", "AL", "AM", "AZ", "BY", "BE", "CY", "CZ", "DK", "EE", "FI", "FR", "GE", "DE", "GR", "HU", "IE", "IS", "IL", "IT", "LV", "LT", "MT", "MD", "ME", "NL", "MK", "NO", "PL", "PT", "RO", "RU", "RS", "SM", "SI", "ES", "SE", "CH", "UK"] },
+				"2016": { "host": "Stockholm", "participants": ["AU", "AT", "AL", "AM", "AZ", "BY", "BE", "BA", "BG", "HR", "CY", "CZ", "DK", "EE", "FI", "FR", "GE", "DE", "GR", "HU", "IE", "IS", "IL", "IT", "LV", "LT", "MT", "MD", "ME", "NL", "MK", "NO", "PL", "RU", "RS", "SM", "SI", "ES", "SE", "CH", "UA", "UK"] },
+				"2017": { "host": "Kyiv", "participants": ["AU", "AT", "AL", "AM", "AZ", "BY", "BE", "BG", "HR", "CY", "CZ", "DK", "EE", "FI", "FR", "GE", "DE", "GR", "HU", "IE", "IS", "IL", "IT", "LV", "LT", "MT", "MD", "ME", "NL", "MK", "NO", "PL", "PT", "RO", "RS", "SM", "SI", "ES", "SE", "CH", "UA", "UK"] },
+				"2018": { "host": "Lisbon", "participants": ["AU", "AT", "AL", "AM", "AZ", "BY", "BE", "BG", "HR", "CY", "CZ", "DK", "EE", "FI", "FR", "GE", "DE", "GR", "HU", "IE", "IS", "IL", "IT", "LV", "LT", "MT", "MD", "ME", "NL", "MK", "NO", "PL", "PT", "RO", "RU", "RS", "SM", "SI", "ES", "SE", "CH", "UA", "UK"] },
+				"2019": { "host": "Tel Aviv", "participants": ["AU", "AT", "AL", "AM", "AZ", "BY", "BE", "HR", "CY", "CZ", "DK", "EE", "FI", "FR", "GE", "DE", "GR", "HU", "IE", "IS", "IL", "IT", "LV", "LT", "MT", "MD", "ME", "NL", "MK", "NO", "PL", "PT", "RO", "RU", "RS", "SM", "SI", "ES", "SE", "CH", "UK"] },
+				"2021": { "host": "Rotterdam", "participants": ["AU", "AT", "AL", "AM", "AZ", "BY", "BE", "BG", "HR", "CY", "CZ", "DK", "EE", "FI", "FR", "GE", "DE", "GR", "IE", "IS", "IL", "IT", "LV", "LT", "MT", "MD", "NL", "MK", "NO", "PL", "PT", "RO", "RU", "RS", "SM", "SI", "ES", "SE", "CH", "UA", "UK"] }
+			};
+
+			function degreesToRadians(degrees) {
+	  			return degrees * Math.PI / 180;
+			}
+
+			function distanceInKmBetweenEarthCoordinates(lat1, lon1, lat2, lon2) {
+				var earthRadiusKm = 6371;
+
+				var dLat = degreesToRadians(lat2-lat1);
+				var dLon = degreesToRadians(lon2-lon1);
+
+				lat1 = degreesToRadians(lat1);
+				lat2 = degreesToRadians(lat2);
+
+				var a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.sin(dLon/2) * Math.sin(dLon/2) * Math.cos(lat1) * Math.cos(lat2); 
+				var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+				return earthRadiusKm * c;
+			}
+
+			function angleBetweenCoordinates(lat1, lon1, lat2, lon2) {
+				var dy = lat2 - lat1;
+				var dx = Math.cos(Math.PI/180 * lat1) * (lon2 - lon1);
+				var angle = Math.atan2(dy, dx) * 180 / Math.PI;
+				// converting to a "clockwise" 360° referential, plus a 2.60° offset (the first "slice" has a 2.60° angle)
+				return (270 - (180 + angle) + 360 + 2.6) % 360
+			}
+
+			function distanceInKmBetweenCityAndCountry(city, country) {
+				var lat1 = cities[city].lat;
+				var lon1 = cities[city].lon;
+				var lat2 = countries[country].lat;
+				var lon2 = countries[country].lon;
+				return distanceInKmBetweenEarthCoordinates(lat1, lon1, lat2, lon2);
+			}
+
+			function angleBetweenCityAndCountry(city, country) {
+				var lat1 = cities[city].lat;
+				var lon1 = cities[city].lon;
+				var lat2 = countries[country].lat;
+				var lon2 = countries[country].lon;
+				return angleBetweenCoordinates(lat1, lon1, lat2, lon2);
+			}
+
+			function distanceToSliceSections(distance, slice_size, first_section) {
+				return Math.ceil(distance / (3200 / slice_size));
+			}
+
+			function generateSectionSizesForSlice(slice, sliceSize) {
+				if (slice.length >= sliceSize) {
+					for (var i=0; i<slice.length; i++) {
+						slice[i].sections = 1;
+					}
+				}
+				else if (slice.length == 1) {
+					slice[0].sections = distanceToSliceSections(slice[0].distance, sliceSize, true);
+					if (slice[0].sections > sliceSize) {
+						slice[0].sections = sliceSize;
+					}
+				}
+				else {
+					slice[0].sections = distanceToSliceSections(slice[0].distance, sliceSize, true);
+					for (var i=1; i<slice.length; i++) {
+						slice[i].sections = distanceToSliceSections(slice[i].distance - slice[i-1].distance, sliceSize, false);
+					}
+					var totalSections = slice.reduce( (prev, cur) => prev + cur.sections, 0);
+					// if total sections > section limit AND there are sections (except the first one) that have a size of more than 1
+					// (sum(section sizes) of all sections minus size of the first one should be equal to size(slice) - 1)
+					if (totalSections > sliceSize && totalSections - slice[0].sections > slice.length - 1) {
+						do {
+							for (var i=1; i<slice.length; i++) {
+								if (slice[i].sections > 1) slice[i].sections = slice[i].sections - 1;
+							}
+							totalSections = slice.reduce( (prev, cur) => prev + cur.sections, 0);
+						} while (totalSections > sliceSize && totalSections - slice[0].sections > slice.length - 1);
+					}
+
+					// if we still have too many sections, start reducing the size of the first one
+					while (totalSections > sliceSize && slice[0].sections >= 1) {
+						slice[0].sections--;
+						totalSections--;
+					}
+				}
+			}
+
+			function drawSlices(slices, sliceSize) {
+				var globalShift = 0;
+				var i;
+				for (i=1; i<=slices.length; i++) {
+					var sliceCountries = [];
+					var slice1 = '<div class="slice" style="';
+					var currentSection = 0;
+					if (slices[i-1].length == 0) {
+						// inserting an empty slice (for the "show grid" mode)
+						for (var j=0; j<sliceSize; j++) {
+							slice1 += '--color' + j + ': transparent; '
+						}
+					} else {
+						for (var j=0; j<slices[i-1].length; j++) {
+							sliceCountries.push(slices[i-1][j].country);
+							for (var k=0; k<slices[i-1][j]["sections"]; k++) {
+								currentSection += 1;
+								var color = slices[i-1].length > 0 ? countries[slices[i-1][j].country].colors[0] : "transparent";
+								slice1 += '--color' + currentSection + ': ' + color + '; ';
+							}
+						}
+					}
+					if (i > 1 && slices[i-2].length > 0) {
+						globalShift++;
+					}
+					slice1 += '--offset:' + (i * 10.90909 + 2.6) + '; --value: 5.554545" countries="' + sliceCountries.join(" > ") + '"></div>';
+					
+					var slice2 = '<div class="slice" style="';
+					currentSection = 0;
+					if (slices[i-1].length == 0) {
+						// inserting an empty slice (for the "show grid" mode)
+						for (var j=0; j<sliceSize; j++) {
+							slice2 += '--color' + j + ': transparent; '
+						}
+					} else {
+						for (var j=0; j<slices[i-1].length; j++) {
+							for (var k=0; k<slices[i-1][j]["sections"]; k++) {
+								currentSection += 1;
+								var color = slices[i-1].length > 0 ? countries[slices[i-1][j].country].colors[1] : "transparent";
+								slice2 += '--color' + currentSection + ': ' + color + '; ';
+							}
+						}
+					}
+					slice2 += '--offset:' + (i * 10.90909 + 2.6 + 5.454545) + '; --value: 5.654545" countries="' + sliceCountries.join(" > ") + '"><label class="label"><span style="background-color: rgba(255, 255, 255, 0.5)">' + sliceCountries.join(" > ") + '</span></label></div>';
+
+					$("#logo").append(slice1);
+					$("#logo").append(slice2);
+				}
+			}
+
+			function drawGrid(sliceSize) {
+				var grid = '<div id="grid">';
+				for (var i=1; i<sliceSize; i++) {
+					var size = ($(".circle").height() / sliceSize) * i;
+					grid += '<div class="separator" style="width: ' + size + 'px; height: ' + size + 'px;"></div>'
+				}
+				grid += '</div>';
+				$("#logo").append(grid);
+			}
+
+			function generateSlices(hostYear, sliceSize, shiftSections) {
+				var hostCity = years[hostYear].host;
+				var participants = years[hostYear].participants;
+
+				var countriesPerSlice = Array(33);
+				for (var i=0; i < 33; i++) {
+					countriesPerSlice[i] = Array();
+				}
+				var slices = Array(33);
+				for (var i=0; i < 33; i++) {
+					slices[i] = Array();
+				}
+				var SLICE_LENGTH = 10.9091; // slice length in degrees; approximation of 360/33 (33 being the number of slices on the official 2021 logo)
+				
+				// assign capital cities to the slice on which they appear
+				participants.forEach(country => {
+					var angle = angleBetweenCityAndCountry(hostCity, country);
+					var sliceNumber = Math.floor(angle / SLICE_LENGTH) -1;
+					if (sliceNumber < 0) {
+						sliceNumber = 0;
+					}
+					var slice = countriesPerSlice[sliceNumber]
+					slice.push({"country": country, "angle": angle});
+					countriesPerSlice.splice(sliceNumber, 1, slice);
+				});
+
+				for (var i=0; i < countriesPerSlice.length; i++) {
+					var countries = [];
+					// compute distance from host city for each city on the slice
+					for (var j=0; j<countriesPerSlice[i].length; j++) {
+						var dist = distanceInKmBetweenCityAndCountry(hostCity, countriesPerSlice[i][j].country);
+						countries.push({"country": countriesPerSlice[i][j].country, "distance": dist, "angle": countriesPerSlice[i][j].angle});
+					}
+
+					if (countries.length == 0) {
+						continue;
+					}
+
+					// sort by distance to host city
+					countries.sort(function(d1, d2) {
+						if (d1.distance > d2.distance) {
+							return 1;
+						}
+						if (d1.distance < d2.distance) {
+							return -1;
+						}
+						return 0;
+					});
+					generateSectionSizesForSlice(countries, sliceSize);
+
+					slices[i] = countries;
+				}
+
+				// the shiftSections parameter indicates whether we should shift a country's sections to a neighbouring slide to make the logo more compact
+				if (shiftSections) {
+					// iterating over all slices to move the remaining extra sections to a neighbouring slice
+					for (var i=0; i<slices.length; i++) {
+						var slice = slices[i];
+						if (slice.length == 0) continue;
+
+						var sliceSections = slice.reduce( (prev, cur) => prev + cur.sections, 0);
+						if (sliceSections <= sliceSize) continue;
+
+						// sort by angle, to start moving sections to the previous/next slice based on which capital city is the closest to that slide
+						slice.sort(function(d1, d2) {
+							if (d1.angle > d2.angle) {
+								return 1;
+							}
+							if (d1.angle < d2.angle) {
+								return -1;
+							}
+							return 0;
+						});
+
+						var previousSlice = (i > 0 ? slices[i-1] : slices[slices.length -1]);
+						var nextSlice = (i < slices.length -1 ? slices[i+1] : slices[0]);
+						var previousSliceSections = previousSlice.reduce( (prev, cur) => prev + cur.sections, 0);
+						var nextSliceSections = nextSlice.reduce( (prev, cur) => prev + cur.sections, 0);
+						var hasPreviousSliceChanged = false;
+						var hasNextSliceChanged = false;
+
+						// if previous slice isn't empty and next slide is, start with previous slice
+						if (previousSliceSections > 0 && nextSliceSections == 0) {
+							for (var nb_sections=previousSliceSections; nb_sections<sliceSize && sliceSections>sliceSize; nb_sections++, sliceSections--) {
+								previousSlice.push(slice[0]);
+								previousSlice[previousSlice.length-1].sections = 1;
+								slice.splice(0,1);
+								hasPreviousSliceChanged = true;
+							}
+
+							for (var nb_sections=nextSliceSections; nb_sections<sliceSize && sliceSections>sliceSize; nb_sections++, sliceSections--) {
+								nextSlice.push(slice[slice.length-1]);
+								nextSlice[nextSlice.length-1].sections = 1;
+								slice.splice(slice.length-1,1);
+								hasNextSliceChanged = true;
+							}
+						// else start with next slice
+						} else {
+							for (var nb_sections=nextSliceSections; nb_sections<sliceSize && sliceSections>sliceSize; nb_sections++, sliceSections--) {
+								nextSlice.push(slice[slice.length-1]);
+								nextSlice[nextSlice.length-1].sections = 1;
+								slice.splice(slice.length-1,1);
+								hasNextSliceChanged = true;
+							}
+
+							for (var nb_sections=previousSliceSections; nb_sections<sliceSize && sliceSections>sliceSize; nb_sections++, sliceSections--) {
+								previousSlice.push(slice[0]);
+								previousSlice[previousSlice.length-1].sections = 1;
+								slice.splice(0,1);
+								hasPreviousSliceChanged = true;
+							}
+
+						}
+
+						// re-sort by distance to host city
+						slice.sort(function(d1, d2) {
+							if (d1.distance > d2.distance) {
+								return 1;
+							}
+							if (d1.distance < d2.distance) {
+								return -1;
+							}
+							return 0;
+						});
+						// recompute sections size
+						generateSectionSizesForSlice(slice, sliceSize);
+
+						if (hasPreviousSliceChanged) {
+							previousSlice.sort(function(d1, d2) {
+								if (d1.distance > d2.distance) {
+									return 1;
+								}
+								if (d1.distance < d2.distance) {
+									return -1;
+								}
+								return 0;
+							});
+							// recompute sections size
+							generateSectionSizesForSlice(previousSlice, sliceSize);
+						}
+
+						if (hasNextSliceChanged) {
+							nextSlice.sort(function(d1, d2) {
+								if (d1.distance > d2.distance) {
+									return 1;
+								}
+								if (d1.distance < d2.distance) {
+									return -1;
+								}
+								return 0;
+							});
+							// recompute sections size
+							generateSectionSizesForSlice(nextSlice, sliceSize);
+						}
+					}
+				}
+				return slices;
+			}
+
+			function drawLogo(slices, sliceSize) {
+				var step = 100/sliceSize;
+				var cssString = "radial-gradient(50% 50% at 50% 0, var(--color1, transparent) 0, ";
+				for (var i=step, j=1; j<sliceSize; i+=step, j+=1) {
+					cssString += "var(--color" + Math.floor(j) + ", transparent) " + i + "%, var(--color" + Math.floor(j+1) + ", transparent) " + i + "%, ";
+				}
+				cssString += "var(--color" + sliceSize + ", transparent) 100%)";
+				$("#slice-style").remove();
+				$("head").append("<style id='slice-style'>.slice:before{background:" + cssString + "}</style>");
+
+				$("#logo").empty();
+				drawSlices(slices, sliceSize);
+				drawGrid(sliceSize);
+				$("#grid").css("display", $("#chk-show-grid").prop('checked') ? "block" : "none");
+				$(".label").css("display", $("#chk-show-labels").prop('checked') ? "block" : "none");
+			}
+
+			function drawInitialLogo(hostYear, minimumSliceSize, defaultSliceSize, maximumSliceSize) {
+				var sliceSize = minimumSliceSize - 1;
+				var slices;
+				var maxSectionsOnASlice;
+
+				do {
+					sliceSize++;
+					slices = generateSlices(hostYear, sliceSize, true);
+					maxSectionsOnASlice = Math.max.apply(Math, (slices.filter(s => s.length > 0).map(arr => arr.map(s => s.sections).reduce((prev, next) => prev+next))));
+				} while (maxSectionsOnASlice > sliceSize);
+				
+				var actualMinimumSliceSize = sliceSize;
+				if (actualMinimumSliceSize < defaultSliceSize && hostYear >= "2004") {
+					sliceSize = defaultSliceSize;
+					slices = generateSlices(hostYear, sliceSize, true);
+				}
+
+				drawLogo(slices, sliceSize);
+				
+				$("#rng-sections").attr("min", actualMinimumSliceSize);
+				$("#rng-sections").attr("max", maximumSliceSize);
+				$("#rng-sections").val(sliceSize);
+				$("#rng-sections-value").html(sliceSize);
+			}
+
+			$(function() {
+				var hostYear = "1956";
+				var defaultSliceSize = 7; // the number of sections on the official logo
+				var minimumSliceSize = 2;
+				var maximumSliceSize = 15;
+
+				$(document).on("input", "#rng-sections", function() {
+					var sliceSize = parseInt($(this).val())
+					var slices = generateSlices(hostYear, sliceSize, true);
+					drawLogo(slices, sliceSize);
+					$("#rng-sections-value").html(sliceSize);
+				});
+
+				$("#sel-host-year").change(function() {
+					var year = $(this).val();
+					hostYear = year;
+					drawInitialLogo(year, minimumSliceSize, defaultSliceSize, maximumSliceSize);
+				});
+
+				$("#chk-show-grid").change(function() {
+					$("#grid-style").remove();
+					$("head").append("<style id='grid-style'>.slice:after{display: " + ($(this).prop('checked') ? "block" : "none") + "}</style>");
+					$(".circle").css("border", $(this).prop('checked') ? "1px dashed #a0a0a0" : "none");
+					$("#grid").css("display", $(this).prop('checked') ? "block" : "none");
+				});
+
+				$("#chk-show-labels").change(function() {
+					$(".label").css("display", $(this).prop('checked') ? "block" : "none");
+				});
+
+				$("#chk-show-grid").prop('checked', false);
+				$("#chk-show-labels").prop('checked', false);
+				drawInitialLogo(hostYear, minimumSliceSize, defaultSliceSize, maximumSliceSize);
+
+				var yearList = Object.keys(years);
+				yearList.forEach(year => $("#sel-host-year").append('<option value="' + year + '"">' + years[year].host + " " + year + '</option>'));
+				$("#sel-host-year").val(yearList);
+			});
+		</script>
+		<link rel="preconnect" href="https://fonts.gstatic.com">
+		<link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet">
+	</head>
+
+	 <body>
+	 	<div id="commands">
+	 		<label for="sel-host-year">Host year</label><br>
+			<select name="hostYear" id="sel-host-year"></select><br><br>
+	 		<label for="rng-sections">Number of sections: </label>
+	 		<span id="rng-sections-value"></span><br>
+ 			<input type="range" min="7" max="13" value="7" id="rng-sections"/><br>
+  			<label for="show-grid">Show grid (laggy)</label>
+ 			<input type="checkbox" id="chk-show-grid" name="show-grid"/><br>
+  			<label for="show-grid">Show country labels</label>
+ 			<input type="checkbox" id="chk-show-labels" name="show-labels"/><br>
+	 	</div>
+	 	<div class="circle" id="logo">
+	 		<div id="grid"></div>
+		</div>
+	</body>
+</html>
